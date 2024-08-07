@@ -1,0 +1,6 @@
+variable x;
+asignar x = 42;
+imprimir "Hola, mundo";
+variable nombre;
+asignar nombre = "GPT";
+imprimir nombre;

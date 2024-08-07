@@ -6,15 +6,15 @@
 #include <termios.h>
 #include <readline/readline.h>
 
-char abecedario[36] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 
-'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+char abecedario[37] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 
+'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '};
 
-char* enMorse[36] = {".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", 
-"-.--", "--..", ".----", "..---", "...--", "....-", ".....", "-....", "--...", "---..", "----.", "-----",};
+char* enMorse[37] = {".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", 
+"-.--", "--..", "-----", ".----", "..---", "...--", "....-", ".....", "-....", "--...", "---..", "----.", "/"};
 
 int fd;
 int duration;
-int unidadDeTiempo = 500; //En MS
+int unidadDeTiempo = 250; //En MS
 char buffer[10];
 
 void todoAMinuscula(char* texto)
@@ -41,6 +41,8 @@ int buscarLetraAbecedario(char letra)
     {
         i++;
     }
+
+    return i;
 }
 
 void enviarPulsos(int i)
@@ -59,10 +61,14 @@ void enviarPulsos(int i)
                     
             //Enviar un salto de línea para indicar el final del comando
             write(fd, "\n", 1);
+
+            //Espero la respuesta del arduino
+            char respuesta;
+            read(fd, &respuesta, 1);
         }
 
         //Si es un - envio un pulso de 3 unidades de tiempo
-        else
+        else if(*enMorse[i] == '-')
         {
             duration = 3 * unidadDeTiempo;
 
@@ -71,12 +77,18 @@ void enviarPulsos(int i)
             write(fd, buffer, strlen(buffer));
                     
             //Enviar un salto de línea para indicar el final del comando
-            write(fd, "\n", 1);                    
+            write(fd, "\n", 1);
+
+            //Espero la respuesta del arduino
+            char respuesta;
+            read(fd, &respuesta, 1);
         }
 
-        //Espero la respuesta del arduino
-        char respuesta;
-        read(fd, &respuesta, 1);
+        //Si es un / espero 7 unidades de tiempo
+        else
+        {
+            usleep(7 * unidadDeTiempo * 1000);
+        }
 
         //Espero una unidad de tiempo antes de enviar el siguiente . o -
         usleep(unidadDeTiempo * 1000);
@@ -120,6 +132,8 @@ int main()
 
         todoAMinuscula(texto);
 
+        int desplazamiento = 0;
+
         //Recorro el texto
         while(*texto != '\0')
         {
@@ -134,7 +148,9 @@ int main()
 
             //avanzo de caracter en el texto
             texto++;
+            desplazamiento++;
         }
+        texto -= desplazamiento;
     }
 
     // Cerrar el puerto serie

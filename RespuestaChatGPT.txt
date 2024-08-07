@@ -1,0 +1,171 @@
+FLEX
+
+%{
+#include "simplelang.tab.h"
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_VAR_NAME_LENGTH 16
+#define MAX_STRING_LENGTH 100
+%}
+
+%%
+
+"variable"         { return VARIABLE; }
+"asignar"          { return ASSIGN; }
+"imprimir"         { return PRINT; }
+\"([^\"\n]*)\"    { 
+    yylval.sval = strdup(yytext + 1); // Eliminar las comillas
+    yylval.sval[strlen(yylval.sval) - 1] = '\0'; // Eliminar la comilla final
+    return STRING;
+}
+[a-zA-Z][a-zA-Z0-9]* {
+    if (strlen(yytext) > MAX_VAR_NAME_LENGTH) {
+        char truncated[MAX_VAR_NAME_LENGTH + 1];
+        strncpy(truncated, yytext, MAX_VAR_NAME_LENGTH);
+        truncated[MAX_VAR_NAME_LENGTH] = '\0';
+        yylval.sval = strdup(truncated);
+    } else {
+        yylval.sval = strdup(yytext);
+    }
+    return IDENTIFIER;
+}
+[0-9]+             { yylval.ival = atoi(yytext); return NUMBER; }
+"="                { return EQUALS; }
+";"                { return SEMICOLON; }
+[ \t\n]            { /* Ignorar espacios en blanco */ }
+.                  { printf("Caracter inesperado: %s\n", yytext); }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+BISON
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void yyerror(const char *s);
+int yylex(void);
+
+#define MAX_VAR_NAME_LENGTH 16
+#define MAX_STRING_LENGTH 100
+
+void assign_variable(char *name, char *value);
+char* get_variable(char *name);
+void print_variable(char *name);
+
+typedef struct Variable {
+    char *name;  // Nombre de la variable
+    char *value; // Valor de la variable (puede ser una cadena)
+    struct Variable *next;  // Puntero a la siguiente variable
+} Variable;
+
+Variable *variables = NULL;  // Lista enlazada de variables
+
+void validate_variable_name(char *name) {
+    if (strlen(name) > MAX_VAR_NAME_LENGTH) {
+        fprintf(stderr, "Error: El nombre de la variable '%s' excede el límite de %d caracteres\n", name, MAX_VAR_NAME_LENGTH);
+        exit(EXIT_FAILURE);
+    }
+}
+
+%}
+
+%token VARIABLE ASSIGN PRINT
+%token IDENTIFIER NUMBER STRING
+%token EQUALS SEMICOLON
+
+%%
+
+program:
+    statements  // El programa consiste en una secuencia de declaraciones
+    ;
+
+statements:
+    statements statement
+    | /* empty */  // O ninguna declaración
+    ;
+
+statement:
+    VARIABLE IDENTIFIER SEMICOLON        { 
+        validate_variable_name($2);
+        assign_variable($2, ""); 
+    }  // Declarar variable de tipo texto con valor vacío
+    | IDENTIFIER ASSIGN STRING SEMICOLON { 
+        validate_variable_name($1);
+        assign_variable($1, $3); 
+    } // Asignar cadena a variable
+    | PRINT IDENTIFIER SEMICOLON         { 
+        validate_variable_name($2);
+        print_variable($2); 
+    }      // Imprimir variable
+    ;
+
+%%
+
+// Función para manejar errores
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+}
+
+// Función para asignar valor a una variable
+void assign_variable(char *name, char *value) {
+    Variable *var = variables;
+    while (var != NULL) {
+        if (strcmp(var->name, name) == 0) {
+            free(var->value); // Liberar memoria del valor existente
+            var->value = strdup(value);
+            return;
+        }
+        var = var->next;
+    }
+    var = (Variable *)malloc(sizeof(Variable));
+    var->name = strdup(name);
+    var->value = strdup(value);
+    var->next = variables;
+    variables = var;
+}
+
+// Función para obtener el valor de una variable
+char* get_variable(char *name) {
+    Variable *var = variables;
+    while (var != NULL) {
+        if (strcmp(var->name, name) == 0) {
+            return var->value;
+        }
+        var = var->next;
+    }
+    printf("Variable indefinida: %s\n", name);
+    return "";
+}
+
+// Función para imprimir el valor de una variable
+void print_variable(char *name) {
+    char *value = get_variable(name);
+    printf("%s = %s\n", name, value);
+    fflush(stdout); // Asegurarse de que el buffer de salida se vacíe
+}
+
+int main(void) {
+    printf("Ingrese el código: \n");
+    return yyparse();  // Llamar al analizador sintáctico
+}
+
+EJEMPLO
+
+variable nombreDeVariable;
+asignar nombreDeVariable = "Hola, mundo!";
+imprimir nombreDeVariable;
+
+COMPILAR Y EJECUTAR
+
+bison -d codigoBison.y
+flex codigoFlex.l
+gcc -o bisonExec codigoBison.tab.c lex.yy.c -lfl
+
+./bisonExec < pruebaBison.txt
