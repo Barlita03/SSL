@@ -131,14 +131,18 @@ statement:
     }
     | PLAY INIT_BRACKET IDENTIFIER COMMA NUMBER CLOSE_BRACKET SEMICOLON // Reproducir variable
     {
+        validate_variable_name($3);
         reproducirVariable($3, $5);
     }
     | PLAY INIT_BRACKET STRING COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON // Reproducir texto con identificador
     {
+        validate_variable_name($5);
         reproducirTextoConIdentificador($3, $5);
     }
     | PLAY INIT_BRACKET IDENTIFIER COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON // Reproducir variable con identificador
     {
+        validate_variable_name($3);
+        validate_variable_name($5);
         reproducirVariableConIdentificador($3, $5);
     }
     | TIME_UNIT EQUALS NUMBER SEMICOLON // Cambiar valor de la unidad de tiempo
