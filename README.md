@@ -21,4 +21,5 @@ Comandos para compilar y ejecutar
     - ./exec < $codigoAEjecutar
 
 Tabla de codigo morse
+-
 ![Tabla de codigo morse](tablaDeCodigoMorse.jpg)
