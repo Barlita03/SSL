@@ -20,4 +20,5 @@ Comandos para compilar y ejecutar
     - gcc codigoBison.tab.c lex.yy.c -o exec -lfl
     - ./exec < $codigoAEjecutar
 
+Tabla de codigo morse
 ![Tabla de codigo morse](tablaDeCodigoMorse.jpg)
