@@ -12,3 +12,12 @@ Sentencias
     - unidadDeTiempo = $numero (duracionEnMS): Cambio la unidad de tiempo
     - abrirPuerto ($direccionDelPuerto(string)): Abro el puerto serial para la comunicacion con el dispositivo de hardware
     - cerrarPuerto: Cierra y libera el puerto serial
+
+Comandos para compilar y ejecutar
+-
+    - flex codigoFlex.l
+    - bison -d codigoBison.y
+    - gcc codigoBison.tab.c lex.yy.c -o exec -lfl
+    - ./exec < $codigoAEjecutar
+
+![Tabla de codigo morse](tablaDeCodigoMorse.jpg)
