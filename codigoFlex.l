@@ -27,14 +27,7 @@
 }
 
 [a-zA-Z][a-zA-Z0-9]* {
-    if (strlen(yytext) > MAX_VAR_NAME_LENGTH) {
-        char truncated[MAX_VAR_NAME_LENGTH + 1];
-        strncpy(truncated, yytext, MAX_VAR_NAME_LENGTH);
-        truncated[MAX_VAR_NAME_LENGTH] = '\0';
-        yylval.sval = strdup(truncated);
-    } else {
-        yylval.sval = strdup(yytext);
-    }
+    yylval.sval = strdup(yytext);
     return IDENTIFIER;
 }
 

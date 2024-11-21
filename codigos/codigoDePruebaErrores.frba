@@ -1,0 +1,6 @@
+retardoRepeticion = 2500;
+abrirPuerto("/dev/ttyACM0");
+
+
+
+cerrarPuerto;

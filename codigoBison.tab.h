@@ -80,7 +80,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 78 "codigoBison.y"
+#line 83 "codigoBison.y"
 
     char *sval;
     int ival;

@@ -99,13 +99,18 @@ struct termios options;
 
 int yylex(void);
 void yyerror(const char *s);
-void assign_variable_texto(char *name, char *value);
-void assign_variable_entero(char *name, int value);
+void create_variable_texto(char *name, char *value);
+void create_variable_entero(char *name, int value);
 void validate_variable_name(char *name);
+void verify_existance(char *name);
+void verify_existance_texto(char *name);
+void verify_existance_entero(char *name);
 void print_variable(char *name);
 void print_text(char *text);
 char* get_variable_texto(char *name);
 int get_variable_entero(char *name);
+void modify_variable_texto(char *name, char *value);
+void modify_variable_entero(char *name, int value);
 
 void reproducirTexto(char* texto, int veces);
 void reproducirVariable(char* name, int veces);
@@ -144,7 +149,7 @@ typedef struct VariableEntero
 
 VariableEntero *variablesEntero = NULL;  // Lista enlazada de variables de texto
 
-#line 148 "codigoBison.tab.c"
+#line 153 "codigoBison.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -524,16 +529,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   70
+#define YYLAST   74
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  21
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  20
+#define YYNRULES  22
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  65
+#define YYNSTATES  71
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   275
@@ -584,9 +589,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    90,    90,    94,    95,    99,   104,   109,   114,   119,
-     124,   128,   132,   136,   140,   144,   148,   152,   156,   160,
-     164
+       0,    95,    95,    99,   100,   104,   109,   114,   119,   124,
+     129,   134,   139,   143,   147,   152,   157,   163,   167,   171,
+     175,   179,   183
 };
 #endif
 
@@ -616,7 +621,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-4)
+#define YYPACT_NINF (-8)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -630,13 +635,14 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -4,    21,    -3,    -4,     9,    10,     8,     7,    11,    12,
-       6,    13,    14,    15,    16,    -4,    17,    18,     2,    24,
-       4,    25,    -4,    26,    19,    -4,     5,    -4,    -4,    27,
-      28,    22,    29,    30,    33,    23,    34,    32,    35,    36,
-      37,    -4,    -2,    -1,    38,    -4,    39,    -4,    -4,    -4,
-      -4,    43,    44,    45,    46,    -4,    -4,    47,    48,    49,
-      50,    -4,    -4,    -4,    -4
+      -8,    25,    -3,    -8,    13,    14,    12,    11,    15,    16,
+      10,    17,    18,    19,    20,    -8,    -7,    -6,     6,    21,
+       8,    22,    -8,    26,    28,    -8,     9,    29,    -8,    31,
+      -8,    23,    30,    32,    24,    27,    33,    34,    36,    35,
+      37,    38,    39,    40,    41,    -8,     2,     3,    42,    -8,
+      43,    -8,    -8,    -8,    -8,    -8,    -8,    47,    48,    49,
+      50,    -8,    -8,    51,    52,    53,    54,    -8,    -8,    -8,
+      -8
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -646,17 +652,18 @@ static const yytype_int8 yydefact[] =
 {
        4,     0,     2,     1,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     3,     0,     0,     0,     0,
-       0,     0,    18,     0,     0,    20,     0,     6,     5,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    15,     0,     0,     0,    16,     0,     7,     8,     9,
-      10,     0,     0,     0,     0,    17,    19,     0,     0,     0,
-       0,    14,    12,    13,    11
+       0,     0,    20,     0,     0,    22,     0,     0,     6,     0,
+       5,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    17,     0,     0,     0,    18,
+       0,     9,    10,     8,     7,    11,    12,     0,     0,     0,
+       0,    19,    21,     0,     0,     0,     0,    16,    14,    15,
+      13
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -4,    -4
+      -8,    -8,    -8,    -8
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -671,25 +678,25 @@ static const yytype_int8 yydefgoto[] =
 static const yytype_int8 yytable[] =
 {
        4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
-      14,    51,    53,    52,    54,    29,    30,    32,    33,    37,
-      38,     3,    16,    17,    18,    19,    22,    20,    21,     0,
-      24,    23,     0,    36,    26,    25,     0,    27,    28,    31,
-      34,    35,    41,    45,    39,    40,     0,     0,    42,    43,
-      44,    46,    47,     0,     0,    48,    49,    50,    55,    56,
-      57,    58,    59,    60,     0,     0,     0,    61,    62,    63,
-      64
+      14,    27,    29,    28,    30,    57,    59,    58,    60,    31,
+      32,    34,    35,    39,    40,     3,    16,    17,    18,    19,
+      22,    20,    21,     0,    24,    23,    33,    36,    26,    25,
+      43,    37,    38,    46,    41,    42,    47,    44,     0,     0,
+      48,     0,    45,    50,    49,    51,     0,    52,    53,    54,
+      55,    56,    61,    62,    63,    64,    65,    66,     0,     0,
+       0,    67,    68,    69,    70
 };
 
 static const yytype_int8 yycheck[] =
 {
        3,     4,     5,     6,     7,     8,     9,    10,    11,    12,
-      13,    13,    13,    15,    15,    13,    14,    13,    14,    14,
-      15,     0,    13,    13,    16,    18,    20,    16,    16,    -1,
-      16,    18,    -1,    14,    18,    20,    -1,    20,    20,    15,
-      15,    15,    20,    20,    17,    17,    -1,    -1,    19,    19,
-      17,    17,    20,    -1,    -1,    20,    20,    20,    20,    20,
-      17,    17,    17,    17,    -1,    -1,    -1,    20,    20,    20,
-      20
+      13,    18,    18,    20,    20,    13,    13,    15,    15,    13,
+      14,    13,    14,    14,    15,     0,    13,    13,    16,    18,
+      20,    16,    16,    -1,    16,    18,    15,    15,    18,    20,
+      17,    15,    14,    19,    15,    14,    19,    17,    -1,    -1,
+      17,    -1,    20,    17,    20,    20,    -1,    20,    20,    20,
+      20,    20,    20,    20,    17,    17,    17,    17,    -1,    -1,
+      -1,    20,    20,    20,    20
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -698,11 +705,12 @@ static const yytype_int8 yystos[] =
 {
        0,    22,    23,     0,     3,     4,     5,     6,     7,     8,
        9,    10,    11,    12,    13,    24,    13,    13,    16,    18,
-      16,    16,    20,    18,    16,    20,    18,    20,    20,    13,
-      14,    15,    13,    14,    15,    15,    14,    14,    15,    17,
-      17,    20,    19,    19,    17,    20,    17,    20,    20,    20,
-      20,    13,    15,    13,    15,    20,    20,    17,    17,    17,
-      17,    20,    20,    20,    20
+      16,    16,    20,    18,    16,    20,    18,    18,    20,    18,
+      20,    13,    14,    15,    13,    14,    15,    15,    14,    14,
+      15,    15,    14,    17,    17,    20,    19,    19,    17,    20,
+      17,    20,    20,    20,    20,    20,    20,    13,    15,    13,
+      15,    20,    20,    17,    17,    17,    17,    20,    20,    20,
+      20
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -710,15 +718,15 @@ static const yytype_int8 yyr1[] =
 {
        0,    21,    22,    23,    23,    24,    24,    24,    24,    24,
       24,    24,    24,    24,    24,    24,    24,    24,    24,    24,
-      24
+      24,    24,    24
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     0,     3,     3,     4,     4,     5,
-       5,     7,     7,     7,     7,     4,     4,     5,     2,     5,
-       2
+       0,     2,     1,     2,     0,     3,     3,     5,     5,     4,
+       4,     5,     5,     7,     7,     7,     7,     4,     4,     5,
+       2,     5,     2
 };
 
 
@@ -1182,140 +1190,162 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* statement: TEXTO IDENTIFIER SEMICOLON  */
-#line 100 "codigoBison.y"
-    { 
-        validate_variable_name((yyvsp[-1].sval));
-        assign_variable_texto((yyvsp[-1].sval), ""); 
-    }
-#line 1191 "codigoBison.tab.c"
-    break;
-
-  case 6: /* statement: ENTERO IDENTIFIER SEMICOLON  */
 #line 105 "codigoBison.y"
     { 
         validate_variable_name((yyvsp[-1].sval));
-        assign_variable_entero((yyvsp[-1].sval), 0); 
+        create_variable_texto((yyvsp[-1].sval), ""); 
     }
-#line 1200 "codigoBison.tab.c"
+#line 1199 "codigoBison.tab.c"
     break;
 
-  case 7: /* statement: IDENTIFIER EQUALS STRING SEMICOLON  */
+  case 6: /* statement: ENTERO IDENTIFIER SEMICOLON  */
 #line 110 "codigoBison.y"
     { 
-        validate_variable_name((yyvsp[-3].sval));
-        assign_variable_texto((yyvsp[-3].sval), (yyvsp[-1].sval)); 
+        validate_variable_name((yyvsp[-1].sval));
+        create_variable_entero((yyvsp[-1].sval), 0); 
     }
-#line 1209 "codigoBison.tab.c"
+#line 1208 "codigoBison.tab.c"
     break;
 
-  case 8: /* statement: IDENTIFIER EQUALS NUMBER SEMICOLON  */
+  case 7: /* statement: TEXTO IDENTIFIER EQUALS STRING SEMICOLON  */
 #line 115 "codigoBison.y"
     { 
         validate_variable_name((yyvsp[-3].sval));
-        assign_variable_entero((yyvsp[-3].sval), (yyvsp[-1].ival)); 
+        create_variable_texto((yyvsp[-3].sval), (yyvsp[-1].sval)); 
     }
-#line 1218 "codigoBison.tab.c"
+#line 1217 "codigoBison.tab.c"
     break;
 
-  case 9: /* statement: PRINT INIT_BRACKET IDENTIFIER CLOSE_BRACKET SEMICOLON  */
+  case 8: /* statement: ENTERO IDENTIFIER EQUALS NUMBER SEMICOLON  */
 #line 120 "codigoBison.y"
-    {
-        validate_variable_name((yyvsp[-2].sval));
-        print_variable((yyvsp[-2].sval)); 
+    { 
+        validate_variable_name((yyvsp[-3].sval));
+        create_variable_entero((yyvsp[-3].sval), (yyvsp[-1].ival)); 
     }
-#line 1227 "codigoBison.tab.c"
+#line 1226 "codigoBison.tab.c"
     break;
 
-  case 10: /* statement: PRINT INIT_BRACKET STRING CLOSE_BRACKET SEMICOLON  */
+  case 9: /* statement: IDENTIFIER EQUALS STRING SEMICOLON  */
 #line 125 "codigoBison.y"
-    {
-        print_text((yyvsp[-2].sval));
+    { 
+        verify_existance((yyvsp[-3].sval));
+        modify_variable_texto((yyvsp[-3].sval), (yyvsp[-1].sval));
     }
 #line 1235 "codigoBison.tab.c"
     break;
 
-  case 11: /* statement: PLAY INIT_BRACKET STRING COMMA NUMBER CLOSE_BRACKET SEMICOLON  */
-#line 129 "codigoBison.y"
+  case 10: /* statement: IDENTIFIER EQUALS NUMBER SEMICOLON  */
+#line 130 "codigoBison.y"
+    { 
+        verify_existance((yyvsp[-3].sval));
+        modify_variable_entero((yyvsp[-3].sval), (yyvsp[-1].ival));
+    }
+#line 1244 "codigoBison.tab.c"
+    break;
+
+  case 11: /* statement: PRINT INIT_BRACKET IDENTIFIER CLOSE_BRACKET SEMICOLON  */
+#line 135 "codigoBison.y"
+    {
+        verify_existance((yyvsp[-2].sval));
+        print_variable((yyvsp[-2].sval)); 
+    }
+#line 1253 "codigoBison.tab.c"
+    break;
+
+  case 12: /* statement: PRINT INIT_BRACKET STRING CLOSE_BRACKET SEMICOLON  */
+#line 140 "codigoBison.y"
+    {
+        print_text((yyvsp[-2].sval));
+    }
+#line 1261 "codigoBison.tab.c"
+    break;
+
+  case 13: /* statement: PLAY INIT_BRACKET STRING COMMA NUMBER CLOSE_BRACKET SEMICOLON  */
+#line 144 "codigoBison.y"
     {
         reproducirTexto((yyvsp[-4].sval), (yyvsp[-2].ival));
     }
-#line 1243 "codigoBison.tab.c"
+#line 1269 "codigoBison.tab.c"
     break;
 
-  case 12: /* statement: PLAY INIT_BRACKET IDENTIFIER COMMA NUMBER CLOSE_BRACKET SEMICOLON  */
-#line 133 "codigoBison.y"
+  case 14: /* statement: PLAY INIT_BRACKET IDENTIFIER COMMA NUMBER CLOSE_BRACKET SEMICOLON  */
+#line 148 "codigoBison.y"
     {
+        verify_existance_texto((yyvsp[-4].sval));
         reproducirVariable((yyvsp[-4].sval), (yyvsp[-2].ival));
     }
-#line 1251 "codigoBison.tab.c"
+#line 1278 "codigoBison.tab.c"
     break;
 
-  case 13: /* statement: PLAY INIT_BRACKET STRING COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON  */
-#line 137 "codigoBison.y"
+  case 15: /* statement: PLAY INIT_BRACKET STRING COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON  */
+#line 153 "codigoBison.y"
     {
+        verify_existance_entero((yyvsp[-2].sval));
         reproducirTextoConIdentificador((yyvsp[-4].sval), (yyvsp[-2].sval));
     }
-#line 1259 "codigoBison.tab.c"
+#line 1287 "codigoBison.tab.c"
     break;
 
-  case 14: /* statement: PLAY INIT_BRACKET IDENTIFIER COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON  */
-#line 141 "codigoBison.y"
+  case 16: /* statement: PLAY INIT_BRACKET IDENTIFIER COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON  */
+#line 158 "codigoBison.y"
     {
+        verify_existance_texto((yyvsp[-4].sval));
+        verify_existance_entero((yyvsp[-2].sval));
         reproducirVariableConIdentificador((yyvsp[-4].sval), (yyvsp[-2].sval));
     }
-#line 1267 "codigoBison.tab.c"
+#line 1297 "codigoBison.tab.c"
     break;
 
-  case 15: /* statement: TIME_UNIT EQUALS NUMBER SEMICOLON  */
-#line 145 "codigoBison.y"
+  case 17: /* statement: TIME_UNIT EQUALS NUMBER SEMICOLON  */
+#line 164 "codigoBison.y"
     {
         cambiarUnidadDeTiempo((yyvsp[-1].ival));
     }
-#line 1275 "codigoBison.tab.c"
+#line 1305 "codigoBison.tab.c"
     break;
 
-  case 16: /* statement: REPEAT EQUALS NUMBER SEMICOLON  */
-#line 149 "codigoBison.y"
+  case 18: /* statement: REPEAT EQUALS NUMBER SEMICOLON  */
+#line 168 "codigoBison.y"
     {
         cambiarRetardoRepeticion((yyvsp[-1].ival));
     }
-#line 1283 "codigoBison.tab.c"
+#line 1313 "codigoBison.tab.c"
     break;
 
-  case 17: /* statement: WAIT INIT_BRACKET NUMBER CLOSE_BRACKET SEMICOLON  */
-#line 153 "codigoBison.y"
+  case 19: /* statement: WAIT INIT_BRACKET NUMBER CLOSE_BRACKET SEMICOLON  */
+#line 172 "codigoBison.y"
     {
         delay((yyvsp[-2].ival));
     }
-#line 1291 "codigoBison.tab.c"
+#line 1321 "codigoBison.tab.c"
     break;
 
-  case 18: /* statement: ENDL SEMICOLON  */
-#line 157 "codigoBison.y"
+  case 20: /* statement: ENDL SEMICOLON  */
+#line 176 "codigoBison.y"
     {
         printf("\n");
     }
-#line 1299 "codigoBison.tab.c"
+#line 1329 "codigoBison.tab.c"
     break;
 
-  case 19: /* statement: OPEN_PORT INIT_BRACKET STRING CLOSE_BRACKET SEMICOLON  */
-#line 161 "codigoBison.y"
+  case 21: /* statement: OPEN_PORT INIT_BRACKET STRING CLOSE_BRACKET SEMICOLON  */
+#line 180 "codigoBison.y"
     {
         abrirPuertoSerial((yyvsp[-2].sval));
     }
-#line 1307 "codigoBison.tab.c"
+#line 1337 "codigoBison.tab.c"
     break;
 
-  case 20: /* statement: CLOSE_PORT SEMICOLON  */
-#line 165 "codigoBison.y"
+  case 22: /* statement: CLOSE_PORT SEMICOLON  */
+#line 184 "codigoBison.y"
     {
         cerrarPuertoSerial();
     }
-#line 1315 "codigoBison.tab.c"
+#line 1345 "codigoBison.tab.c"
     break;
 
 
-#line 1319 "codigoBison.tab.c"
+#line 1349 "codigoBison.tab.c"
 
       default: break;
     }
@@ -1508,7 +1538,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 169 "codigoBison.y"
+#line 188 "codigoBison.y"
 
 
 //------------DEFINICION DE FUNCIONES------------
@@ -1522,6 +1552,29 @@ void yyerror(const char *s)
 //Funcion para validar el nombre de las variables
 void validate_variable_name(char *name) 
 {
+    VariableTexto *varTXT = variablesTexto;
+    VariableEntero *varINT = variablesEntero;
+
+    while (varTXT != NULL)
+    {
+        if (strcmp(varTXT->name, name) == 0)
+        {
+            fprintf(stderr, "Error: El nombre de la variable '%s' no se encuentra disponible\n", name);
+            exit(EXIT_FAILURE);
+        }
+        varTXT = varTXT->next;
+    }
+
+    while (varINT != NULL)
+    {
+        if (strcmp(varINT->name, name) == 0)
+        {
+            fprintf(stderr, "Error: El nombre de la variable '%s' no se encuentra disponible\n", name);
+            exit(EXIT_FAILURE);
+        }
+        varINT = varINT->next;
+    }
+
     if (strlen(name) > MAX_VAR_NAME_LENGTH) 
     {
         fprintf(stderr, "Error: El nombre de la variable '%s' excede el límite de %d caracteres\n", name, MAX_VAR_NAME_LENGTH);
@@ -1529,9 +1582,100 @@ void validate_variable_name(char *name)
     }
 }
 
-// Función para asignar valor a una variable de texto
-void assign_variable_texto(char *name, char *value)
+// Funcion para verificar la existencia de una variable
+void verify_existance(char *name)
 {
+    int existe = 0;
+
+    VariableTexto *varTXT = variablesTexto;
+    VariableEntero *varINT = variablesEntero;
+
+    while (varTXT != NULL)
+    {
+        if (strcmp(varTXT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varTXT = varTXT->next;
+    }
+
+    while (varINT != NULL)
+    {
+        if (strcmp(varINT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varINT = varINT->next;
+    }
+    
+    if(!existe)
+    {
+        fprintf(stderr, "Error: La variable '%s' no existe\n", name);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Funcion para verificar la existencia de una variable del tipo texto
+void verify_existance_texto(char *name)
+{
+    int existe = 0;
+
+    VariableTexto *varTXT = variablesTexto;
+
+    while (varTXT != NULL)
+    {
+        if (strcmp(varTXT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varTXT = varTXT->next;
+    }
+
+    if(!existe)
+    {
+        fprintf(stderr, "Error: La variable '%s' no es de tipo texto\n", name);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Funcion para verificar la existencia de una variable del tipo entero
+void verify_existance_entero(char *name)
+{
+    int existe = 0;
+
+    VariableEntero *varINT = variablesEntero;
+
+    while (varINT != NULL)
+    {
+        if (strcmp(varINT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varINT = varINT->next;
+    }
+
+    if(!existe)
+    {
+        fprintf(stderr, "Error: La variable '%s' no es de tipo entero\n", name);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Función para asignar valor a una variable de texto
+void create_variable_texto(char *name, char *value)
+{
+    VariableTexto *var = (VariableTexto *) malloc(sizeof(VariableTexto));
+    var->name = strdup(name);
+    var->value = strdup(value);
+    var->next = variablesTexto;
+    variablesTexto = var;
+}
+
+// Funcion para modificar el valor de una variable de texto
+void modify_variable_texto(char *name, char *value)
+{
+    verify_existance_texto(name);
+
     VariableTexto *var = variablesTexto;
 
     while (var != NULL)
@@ -1544,17 +1688,23 @@ void assign_variable_texto(char *name, char *value)
         }
         var = var->next;
     }
-
-    var = (VariableTexto *) malloc(sizeof(VariableTexto));
-    var->name = strdup(name);
-    var->value = strdup(value);
-    var->next = variablesTexto;
-    variablesTexto = var;
 }
 
 // Función para asignar valor a una variable entera
-void assign_variable_entero(char *name, int value)
+void create_variable_entero(char *name, int value)
 {
+    VariableEntero *var = (VariableEntero *) malloc(sizeof(VariableEntero));
+    var->name = strdup(name);
+    var->value = value;
+    var->next = variablesEntero;
+    variablesEntero = var;
+}
+
+// Funcion para modificar el valor de una variable entera
+void modify_variable_entero(char *name, int value)
+{
+    verify_existance_entero(name);
+
     VariableEntero *var = variablesEntero;
     
     while (var != NULL)
@@ -1566,12 +1716,6 @@ void assign_variable_entero(char *name, int value)
         }
         var = var->next;
     }
-
-    var = (VariableEntero *) malloc(sizeof(VariableEntero));
-    var->name = strdup(name);
-    var->value = value;
-    var->next = variablesEntero;
-    variablesEntero = var;
 }
 
 // Función para obtener el valor de una variable

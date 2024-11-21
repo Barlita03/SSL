@@ -29,13 +29,18 @@ struct termios options;
 
 int yylex(void);
 void yyerror(const char *s);
-void assign_variable_texto(char *name, char *value);
-void assign_variable_entero(char *name, int value);
+void create_variable_texto(char *name, char *value);
+void create_variable_entero(char *name, int value);
 void validate_variable_name(char *name);
+void verify_existance(char *name);
+void verify_existance_texto(char *name);
+void verify_existance_entero(char *name);
 void print_variable(char *name);
 void print_text(char *text);
 char* get_variable_texto(char *name);
 int get_variable_entero(char *name);
+void modify_variable_texto(char *name, char *value);
+void modify_variable_entero(char *name, int value);
 
 void reproducirTexto(char* texto, int veces);
 void reproducirVariable(char* name, int veces);
@@ -99,29 +104,39 @@ statement:
     TEXTO IDENTIFIER SEMICOLON // Declarar variable de tipo texto con valor vacío
     { 
         validate_variable_name($2);
-        assign_variable_texto($2, ""); 
+        create_variable_texto($2, ""); 
     }
     | ENTERO IDENTIFIER SEMICOLON // Declarar variable de tipo entero con valor 0
     { 
         validate_variable_name($2);
-        assign_variable_entero($2, 0); 
+        create_variable_entero($2, 0); 
     }
-    | IDENTIFIER EQUALS STRING SEMICOLON // Asignar cadena a variable
+    | TEXTO IDENTIFIER EQUALS STRING SEMICOLON // Declarar variable de tipo texto con valor definido
     { 
-        validate_variable_name($1);
-        assign_variable_texto($1, $3); 
+        validate_variable_name($2);
+        create_variable_texto($2, $4); 
     }
-    | IDENTIFIER EQUALS NUMBER SEMICOLON // Asignar cadena a variable
+    | ENTERO IDENTIFIER EQUALS NUMBER SEMICOLON // Declarar variable de tipo entero con valor definido
     { 
-        validate_variable_name($1);
-        assign_variable_entero($1, $3); 
+        validate_variable_name($2);
+        create_variable_entero($2, $4); 
+    }
+    | IDENTIFIER EQUALS STRING SEMICOLON // Modificar cadena a variable
+    { 
+        verify_existance($1);
+        modify_variable_texto($1, $3);
+    }
+    | IDENTIFIER EQUALS NUMBER SEMICOLON // Modificar valor a variable
+    { 
+        verify_existance($1);
+        modify_variable_entero($1, $3);
     }
     | PRINT INIT_BRACKET IDENTIFIER CLOSE_BRACKET SEMICOLON // Imprimir variable
     {
-        validate_variable_name($3);
+        verify_existance($3);
         print_variable($3); 
     }
-    | PRINT INIT_BRACKET STRING CLOSE_BRACKET SEMICOLON // Imprimir variable
+    | PRINT INIT_BRACKET STRING CLOSE_BRACKET SEMICOLON // Imprimir texto
     {
         print_text($3);
     }
@@ -131,18 +146,18 @@ statement:
     }
     | PLAY INIT_BRACKET IDENTIFIER COMMA NUMBER CLOSE_BRACKET SEMICOLON // Reproducir variable
     {
-        validate_variable_name($3);
+        verify_existance_texto($3);
         reproducirVariable($3, $5);
     }
     | PLAY INIT_BRACKET STRING COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON // Reproducir texto con identificador
     {
-        validate_variable_name($5);
+        verify_existance_entero($5);
         reproducirTextoConIdentificador($3, $5);
     }
     | PLAY INIT_BRACKET IDENTIFIER COMMA IDENTIFIER CLOSE_BRACKET SEMICOLON // Reproducir variable con identificador
     {
-        validate_variable_name($3);
-        validate_variable_name($5);
+        verify_existance_texto($3);
+        verify_existance_entero($5);
         reproducirVariableConIdentificador($3, $5);
     }
     | TIME_UNIT EQUALS NUMBER SEMICOLON // Cambiar valor de la unidad de tiempo
@@ -183,6 +198,29 @@ void yyerror(const char *s)
 //Funcion para validar el nombre de las variables
 void validate_variable_name(char *name) 
 {
+    VariableTexto *varTXT = variablesTexto;
+    VariableEntero *varINT = variablesEntero;
+
+    while (varTXT != NULL)
+    {
+        if (strcmp(varTXT->name, name) == 0)
+        {
+            fprintf(stderr, "Error: El nombre de la variable '%s' no se encuentra disponible\n", name);
+            exit(EXIT_FAILURE);
+        }
+        varTXT = varTXT->next;
+    }
+
+    while (varINT != NULL)
+    {
+        if (strcmp(varINT->name, name) == 0)
+        {
+            fprintf(stderr, "Error: El nombre de la variable '%s' no se encuentra disponible\n", name);
+            exit(EXIT_FAILURE);
+        }
+        varINT = varINT->next;
+    }
+
     if (strlen(name) > MAX_VAR_NAME_LENGTH) 
     {
         fprintf(stderr, "Error: El nombre de la variable '%s' excede el límite de %d caracteres\n", name, MAX_VAR_NAME_LENGTH);
@@ -190,9 +228,100 @@ void validate_variable_name(char *name)
     }
 }
 
-// Función para asignar valor a una variable de texto
-void assign_variable_texto(char *name, char *value)
+// Funcion para verificar la existencia de una variable
+void verify_existance(char *name)
 {
+    int existe = 0;
+
+    VariableTexto *varTXT = variablesTexto;
+    VariableEntero *varINT = variablesEntero;
+
+    while (varTXT != NULL)
+    {
+        if (strcmp(varTXT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varTXT = varTXT->next;
+    }
+
+    while (varINT != NULL)
+    {
+        if (strcmp(varINT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varINT = varINT->next;
+    }
+    
+    if(!existe)
+    {
+        fprintf(stderr, "Error: La variable '%s' no existe\n", name);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Funcion para verificar la existencia de una variable del tipo texto
+void verify_existance_texto(char *name)
+{
+    int existe = 0;
+
+    VariableTexto *varTXT = variablesTexto;
+
+    while (varTXT != NULL)
+    {
+        if (strcmp(varTXT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varTXT = varTXT->next;
+    }
+
+    if(!existe)
+    {
+        fprintf(stderr, "Error: La variable '%s' no es de tipo texto\n", name);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Funcion para verificar la existencia de una variable del tipo entero
+void verify_existance_entero(char *name)
+{
+    int existe = 0;
+
+    VariableEntero *varINT = variablesEntero;
+
+    while (varINT != NULL)
+    {
+        if (strcmp(varINT->name, name) == 0)
+        {
+            existe = 1;
+        }
+        varINT = varINT->next;
+    }
+
+    if(!existe)
+    {
+        fprintf(stderr, "Error: La variable '%s' no es de tipo entero\n", name);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Función para asignar valor a una variable de texto
+void create_variable_texto(char *name, char *value)
+{
+    VariableTexto *var = (VariableTexto *) malloc(sizeof(VariableTexto));
+    var->name = strdup(name);
+    var->value = strdup(value);
+    var->next = variablesTexto;
+    variablesTexto = var;
+}
+
+// Funcion para modificar el valor de una variable de texto
+void modify_variable_texto(char *name, char *value)
+{
+    verify_existance_texto(name);
+
     VariableTexto *var = variablesTexto;
 
     while (var != NULL)
@@ -205,17 +334,23 @@ void assign_variable_texto(char *name, char *value)
         }
         var = var->next;
     }
-
-    var = (VariableTexto *) malloc(sizeof(VariableTexto));
-    var->name = strdup(name);
-    var->value = strdup(value);
-    var->next = variablesTexto;
-    variablesTexto = var;
 }
 
 // Función para asignar valor a una variable entera
-void assign_variable_entero(char *name, int value)
+void create_variable_entero(char *name, int value)
 {
+    VariableEntero *var = (VariableEntero *) malloc(sizeof(VariableEntero));
+    var->name = strdup(name);
+    var->value = value;
+    var->next = variablesEntero;
+    variablesEntero = var;
+}
+
+// Funcion para modificar el valor de una variable entera
+void modify_variable_entero(char *name, int value)
+{
+    verify_existance_entero(name);
+
     VariableEntero *var = variablesEntero;
     
     while (var != NULL)
@@ -227,12 +362,6 @@ void assign_variable_entero(char *name, int value)
         }
         var = var->next;
     }
-
-    var = (VariableEntero *) malloc(sizeof(VariableEntero));
-    var->name = strdup(name);
-    var->value = value;
-    var->next = variablesEntero;
-    variablesEntero = var;
 }
 
 // Función para obtener el valor de una variable

@@ -859,14 +859,14 @@ case 12:
 YY_RULE_SETUP
 #line 29 "codigoFlex.l"
 {
-    if (strlen(yytext) > MAX_VAR_NAME_LENGTH) {
-        char truncated[MAX_VAR_NAME_LENGTH + 1];
-        strncpy(truncated, yytext, MAX_VAR_NAME_LENGTH);
-        truncated[MAX_VAR_NAME_LENGTH] = '\0';
-        yylval.sval = strdup(truncated);
-    } else {
+    // if (strlen(yytext) > MAX_VAR_NAME_LENGTH) {
+    //     char truncated[MAX_VAR_NAME_LENGTH + 1];
+    //     strncpy(truncated, yytext, MAX_VAR_NAME_LENGTH);
+    //     truncated[MAX_VAR_NAME_LENGTH] = '\0';
+    //     yylval.sval = strdup(truncated);
+    // } else {
         yylval.sval = strdup(yytext);
-    }
+    // }
     return IDENTIFIER;
 }
 	YY_BREAK
